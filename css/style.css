@@ -1,0 +1,555 @@
+/* ============================================================
+   CLICK FRENZY — Main Stylesheet
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. RESET & BASE
+   ------------------------------------------------------------ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0a0a1a;
+  color: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ------------------------------------------------------------
+   2. APP CONTAINER
+   ------------------------------------------------------------ */
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0d0d24 100%);
+  overflow: hidden;
+}
+
+#app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255, 51, 102, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(51, 204, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 0%, rgba(255, 204, 0, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   3. SCREENS
+   ------------------------------------------------------------ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
+.screen-content {
+  text-align: center;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+}
+
+/* ------------------------------------------------------------
+   4. TYPOGRAPHY
+   ------------------------------------------------------------ */
+.game-title {
+  font-size: clamp(2.5rem, 10vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ff3366, #ffcc00, #33ccff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(255, 51, 102, 0.3));
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  animation: title-glow 3s ease infinite, float-bg 6s ease infinite;
+}
+
+.game-over-title {
+  font-size: clamp(2.5rem, 10vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ff3366, #ff0044);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(255, 51, 102, 0.4));
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------
+   5. BUTTONS
+   ------------------------------------------------------------ */
+.btn {
+  display: inline-block;
+  padding: 0.9rem 2.8rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff3366, #ff0055);
+  color: #fff;
+  box-shadow: 0 4px 25px rgba(255, 51, 102, 0.4);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 40px rgba(255, 51, 102, 0.6);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  margin-top: 0.8rem;
+  box-shadow: none;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------------------------------------
+   6. BEST SCORE (start screen)
+   ------------------------------------------------------------ */
+.best-score {
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.best-score span {
+  color: #ffcc00;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* ------------------------------------------------------------
+   7. HUD
+   ------------------------------------------------------------ */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: clamp(0.5rem, 2vw, 1rem) clamp(0.6rem, 2.5vw, 1.5rem);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.hud-item {
+  text-align: center;
+  min-width: 60px;
+}
+
+.hud-label {
+  display: block;
+  font-size: clamp(0.55rem, 1.4vw, 0.7rem);
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+}
+
+.hud-value {
+  display: block;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.hud-value.score { color: #33ccff; }
+
+.hud-value.timer { color: #ffcc00; }
+
+
+.hud-value.combo { color: #00ff88; }
+
+.hud-lives {
+  display: flex;
+  gap: 0.2rem;
+  justify-content: center;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+}
+
+.heart {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.heart.lost {
+  filter: grayscale(1) opacity(0.25);
+  transform: scale(0.8);
+}
+
+.heart.breaking {
+  animation: heart-break 0.5s ease forwards;
+}
+
+/* ------------------------------------------------------------
+   8. GAME AREA
+   ------------------------------------------------------------ */
+#gameArea {
+  position: absolute;
+  inset: 0;
+  top: clamp(60px, 12vw, 90px);
+  cursor: crosshair;
+  overflow: hidden;
+}
+
+#gameArea:active {
+  cursor: crosshair;
+}
+
+/* ------------------------------------------------------------
+   9. GAME OBJECTS
+   ------------------------------------------------------------ */
+.game-object {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: scale(0);
+  opacity: 0;
+  transition: none;
+  will-change: transform, opacity;
+  z-index: 5;
+  touch-action: manipulation;
+}
+
+.game-object .emoji {
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.game-object.show {
+  animation: object-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.game-object.hide {
+  animation: object-disappear 0.25s ease forwards;
+}
+
+.game-object.caught {
+  animation: object-caught 0.35s ease forwards;
+}
+
+.game-object .glow-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.4;
+  animation: ring-pulse 1.2s ease infinite;
+}
+
+/* ------------------------------------------------------------
+   10. SCORE POPUPS
+   ------------------------------------------------------------ */
+.score-popup {
+  position: absolute;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #ffcc00;
+  text-shadow: 0 0 20px rgba(255, 204, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  animation: score-float 1s ease forwards;
+}
+
+.score-popup.combo {
+  color: #00ff88;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.6), 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+/* ------------------------------------------------------------
+   11. PARTICLES
+   ------------------------------------------------------------ */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 25;
+  animation: particle-fly 0.7s ease-out forwards;
+}
+
+/* ------------------------------------------------------------
+   12. COMBO POPUP
+   ------------------------------------------------------------ */
+#comboPopup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 900;
+  color: #00ff88;
+  text-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+  pointer-events: none;
+  z-index: 35;
+  opacity: 0;
+  transition: none;
+}
+
+#comboPopup.show {
+  animation: combo-pop 0.8s ease forwards;
+}
+
+/* ------------------------------------------------------------
+   13. GAME OVER SCREEN
+   ------------------------------------------------------------ */
+.final-score,
+.final-best {
+  margin: 1rem 0;
+}
+
+.final-score p,
+.final-best p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.final-score span {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffcc00, #ff8800);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(255, 204, 0, 0.3));
+}
+
+.final-best span {
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-weight: 700;
+  color: #33ccff;
+  filter: drop-shadow(0 0 20px rgba(51, 204, 255, 0.3));
+}
+
+.final-best.new-record span {
+  background: linear-gradient(135deg, #ffcc00, #ff3366);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glow-pulse 1s ease infinite;
+}
+
+.new-record-text {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #ffcc00;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  animation: glow-pulse 0.8s ease infinite;
+}
+
+/* ------------------------------------------------------------
+   14. SHAKE OVERLAY
+   ------------------------------------------------------------ */
+#shakeOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+#shakeOverlay.active {
+  opacity: 1;
+  animation: screen-shake 0.3s ease;
+}
+
+/* ------------------------------------------------------------
+   15. DIFFICULTY BAR
+   ------------------------------------------------------------ */
+#difficultyBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#difficultyBar .fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ff88, #ffcc00, #ff3366);
+  transition: width 0.5s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ------------------------------------------------------------
+   16. KEYFRAMES
+   ------------------------------------------------------------ */
+@keyframes object-appear {
+  0%   { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes object-disappear {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.3); opacity: 0; }
+}
+
+@keyframes object-caught {
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(1.3); opacity: 0.9; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50%      { transform: scale(1.15); opacity: 0.1; }
+}
+
+@keyframes score-float {
+  0%   { transform: translateY(0) scale(0.5); opacity: 1; }
+  100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
+}
+
+@keyframes particle-fly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+@keyframes combo-pop {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  40%  { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+  70%  { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+@keyframes heart-break {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.3); opacity: 0.5; }
+  100% { transform: scale(0.3) rotate(20deg); opacity: 0; }
+}
+
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0); }
+  20%      { transform: translate(-4px, 3px); }
+  40%      { transform: translate(3px, -4px); }
+  60%      { transform: translate(-3px, 2px); }
+  80%      { transform: translate(2px, -2px); }
+}
+
+@keyframes float-bg {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33%      { transform: translateY(-10px) rotate(1deg); }
+  66%      { transform: translateY(5px) rotate(-1deg); }
+}
+
+@keyframes title-glow {
+  0%, 100% { filter: drop-shadow(0 0 40px rgba(255, 51, 102, 0.3)); }
+  50%      { filter: drop-shadow(0 0 70px rgba(255, 51, 102, 0.5)); }
+}
+
+/* ------------------------------------------------------------
+   17. RESPONSIVE
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .btn {
+    padding: 0.8rem 2rem;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .game-object {
+    min-width: 50px;
+    min-height: 50px;
+  }
+}
+
+@media (min-width: 768px) {
+  .game-object {
+    min-width: 60px;
+    min-height: 60px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #gameArea {
+    cursor: default;
+  }
+}

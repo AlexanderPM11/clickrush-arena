@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Click Frenzy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Shake overlay -->
+  <div id="shakeOverlay"></div>
+
+  <!-- Start screen -->
+  <div id="startScreen" class="screen">
+    <div class="screen-content">
+      <h1 class="game-title">CLICK FRENZY</h1>
+      <p class="subtitle">
+        Toca los objetos brillantes antes de que desaparezcan.<br>
+        Cada acierto suma puntos, cada fallo cuesta una vida.
+      </p>
+      <button id="playBtn" class="btn btn-primary">Jugar</button>
+      <div class="best-score">
+        Mejor puntuaci&oacute;n &mdash; <span id="bestScoreDisplay">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game screen -->
+  <div id="gameScreen" class="screen hidden">
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">Puntos</span>
+        <span id="scoreDisplay" class="hud-value score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Tiempo</span>
+        <span id="timerDisplay" class="hud-value timer">0:00</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Vidas</span>
+        <div class="hud-lives" id="livesDisplay">
+          <span class="heart" data-i="0">&hearts;</span>
+          <span class="heart" data-i="1">&hearts;</span>
+          <span class="heart" data-i="2">&hearts;</span>
+        </div>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Combo</span>
+        <span id="comboDisplay" class="hud-value combo">x1</span>
+      </div>
+    </div>
+
+    <div id="gameArea"></div>
+    <div id="comboPopup"></div>
+
+    <div id="difficultyBar">
+      <div class="fill" id="difficultyFill"></div>
+    </div>
+  </div>
+
+  <!-- Game over screen -->
+  <div id="gameOverScreen" class="screen hidden">
+    <div class="screen-content">
+      <h1 class="game-over-title">GAME OVER</h1>
+      <div class="final-score">
+        <p>Puntuaci&oacute;n final</p>
+        <span id="finalScoreDisplay">0</span>
+      </div>
+      <div class="final-best" id="finalBestContainer">
+        <p>Mejor puntuaci&oacute;n</p>
+        <span id="finalBestDisplay">0</span>
+      </div>
+      <button id="restartBtn" class="btn btn-primary">Reintentar</button>
+      <button id="homeBtn" class="btn btn-secondary">Men&uacute; principal</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
