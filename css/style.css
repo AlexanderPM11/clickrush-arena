@@ -1,5 +1,5 @@
 /* ============================================================
-   CLICK FRENZY — Main Stylesheet
+   CLICK FRENZY — Complete Stylesheet
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -52,6 +52,7 @@ html, body {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 10;
@@ -105,6 +106,14 @@ html, body {
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 2rem;
   line-height: 1.5;
+}
+
+.complete-level-name {
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
 }
 
 /* ------------------------------------------------------------
@@ -166,7 +175,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   6. BEST SCORE (start screen)
+   6. START SCREEN
    ------------------------------------------------------------ */
 .best-score {
   margin-top: 1.5rem;
@@ -181,7 +190,192 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   7. HUD
+   7. LEVEL MAP
+   ------------------------------------------------------------ */
+#levelMapScreen {
+  justify-content: flex-start;
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.map-header {
+  text-align: center;
+  padding: 1.2rem 1rem 0.5rem;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.map-header h2 {
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #33ccff, #00ff88);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#levelMapContainer {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 420px;
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scroll-behavior: smooth;
+}
+
+#levelMapContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+#levelMapContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#levelMapContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.map-footer {
+  padding: 0.8rem 1rem calc(env(safe-area-inset-bottom, 0) + 0.8rem);
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.map-footer .btn {
+  padding: 0.6rem 1.8rem;
+  font-size: 0.85rem;
+}
+
+/* Level node */
+.level-node {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+  transition: transform 0.3s ease;
+  padding: 0.25rem 0;
+}
+
+.level-node.unlocked {
+  cursor: pointer;
+}
+
+.level-node.unlocked:hover {
+  transform: scale(1.04);
+}
+
+.level-node.unlocked:active {
+  transform: scale(0.97);
+}
+
+.node-circle {
+  width: clamp(56px, 14vw, 72px);
+  height: clamp(56px, 14vw, 72px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.4s ease;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 800;
+}
+
+.level-node.locked .node-circle {
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.level-node.locked .node-circle::after {
+  content: '\1F512';
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  filter: grayscale(1) opacity(0.3);
+}
+
+.level-node.available .node-circle {
+  background: radial-gradient(circle at 35% 35%, rgba(51, 204, 255, 0.25), rgba(51, 204, 255, 0.08));
+  border: 2px solid #33ccff;
+  color: #33ccff;
+  box-shadow: 0 0 20px rgba(51, 204, 255, 0.3);
+  animation: node-pulse 2s ease infinite;
+}
+
+.level-node.completed .node-circle {
+  background: radial-gradient(circle at 35% 35%, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.05));
+  border: 2px solid #00ff88;
+  color: #00ff88;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+}
+
+.level-node.completed .node-circle::after {
+  content: '\2713';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #00ff88;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+}
+
+.node-info {
+  margin-top: 0.35rem;
+  text-align: center;
+}
+
+.node-name {
+  display: block;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.level-node.locked .node-name { color: rgba(255, 255, 255, 0.2); }
+.level-node.available .node-name { color: #fff; }
+.level-node.completed .node-name { color: rgba(255, 255, 255, 0.7); }
+
+.node-target {
+  display: block;
+  font-size: clamp(0.6rem, 1.6vw, 0.75rem);
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 0.1rem;
+}
+
+.node-best {
+  display: block;
+  font-size: clamp(0.55rem, 1.4vw, 0.7rem);
+  color: #ffcc00;
+  margin-top: 0.1rem;
+  font-weight: 600;
+}
+
+/* Connector between nodes */
+.level-connector {
+  width: 2px;
+  height: clamp(20px, 5vw, 32px);
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  transition: background 0.5s ease;
+}
+
+.level-connector.completed {
+  background: rgba(0, 255, 136, 0.3);
+}
+
+/* ------------------------------------------------------------
+   8. HUD
    ------------------------------------------------------------ */
 #hud {
   position: absolute;
@@ -201,21 +395,21 @@ html, body {
 
 .hud-item {
   text-align: center;
-  min-width: 60px;
+  min-width: 50px;
 }
 
 .hud-label {
   display: block;
-  font-size: clamp(0.55rem, 1.4vw, 0.7rem);
+  font-size: clamp(0.5rem, 1.3vw, 0.65rem);
   letter-spacing: 0.15em;
   color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
   text-transform: uppercase;
 }
 
 .hud-value {
   display: block;
-  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-size: clamp(1rem, 2.8vw, 1.5rem);
   font-weight: 800;
   letter-spacing: 0.03em;
   transition: all 0.2s ease;
@@ -225,14 +419,13 @@ html, body {
 
 .hud-value.timer { color: #ffcc00; }
 
-
 .hud-value.combo { color: #00ff88; }
 
 .hud-lives {
   display: flex;
-  gap: 0.2rem;
+  gap: 0.15rem;
   justify-content: center;
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-size: clamp(0.9rem, 2.3vw, 1.3rem);
 }
 
 .heart {
@@ -250,12 +443,50 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   8. GAME AREA
+   9. LEVEL LABEL & TARGET BAR
+   ------------------------------------------------------------ */
+#levelLabel {
+  position: absolute;
+  top: clamp(48px, 10vw, 70px);
+  left: 0;
+  right: 0;
+  z-index: 19;
+  text-align: center;
+  font-size: clamp(0.65rem, 1.6vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+#targetBar {
+  position: absolute;
+  top: clamp(68px, 13vw, 90px);
+  left: 10%;
+  right: 10%;
+  z-index: 19;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+#targetBar .fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #33ccff, #00ff88);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------
+   10. GAME AREA
    ------------------------------------------------------------ */
 #gameArea {
   position: absolute;
   inset: 0;
-  top: clamp(60px, 12vw, 90px);
+  top: clamp(80px, 17vw, 110px);
   cursor: crosshair;
   overflow: hidden;
 }
@@ -265,7 +496,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   9. GAME OBJECTS
+   11. GAME OBJECTS
    ------------------------------------------------------------ */
 .game-object {
   position: absolute;
@@ -284,7 +515,7 @@ html, body {
 }
 
 .game-object .emoji {
-  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-size: clamp(1rem, 3.5vw, 1.8rem);
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
@@ -310,8 +541,19 @@ html, body {
   animation: ring-pulse 1.2s ease infinite;
 }
 
+.game-object .object-timer {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: transparent;
+  pointer-events: none;
+  animation: timer-spin linear forwards;
+  opacity: 0.6;
+}
+
 /* ------------------------------------------------------------
-   10. SCORE POPUPS
+   12. SCORE POPUPS
    ------------------------------------------------------------ */
 .score-popup {
   position: absolute;
@@ -331,7 +573,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   11. PARTICLES
+   13. PARTICLES
    ------------------------------------------------------------ */
 .particle {
   position: absolute;
@@ -342,7 +584,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   12. COMBO POPUP
+   14. COMBO POPUP
    ------------------------------------------------------------ */
 #comboPopup {
   position: absolute;
@@ -364,7 +606,67 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   13. GAME OVER SCREEN
+   15. LEVEL COMPLETE SCREEN
+   ------------------------------------------------------------ */
+.celebration-icon {
+  font-size: clamp(3rem, 12vw, 5rem);
+  margin-bottom: 0.5rem;
+  animation: celebrate-bounce 0.6s ease 0.2s both;
+  filter: drop-shadow(0 0 30px rgba(255, 204, 0, 0.4));
+}
+
+.complete-title {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #00ff88, #33ccff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.3));
+  margin-bottom: 0.3rem;
+}
+
+.complete-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vw, 1.2rem);
+  margin: 1.2rem 0;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  min-width: 80px;
+  flex: 1 0 auto;
+  max-width: 130px;
+}
+
+.stat-value {
+  display: block;
+  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-label {
+  display: block;
+  font-size: clamp(0.55rem, 1.4vw, 0.7rem);
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.2rem;
+}
+
+#allCompleteMessage {
+  margin: 0.5rem 0 1rem;
+}
+
+/* ------------------------------------------------------------
+   16. GAME OVER SCREEN
    ------------------------------------------------------------ */
 .final-score,
 .final-best {
@@ -397,25 +699,8 @@ html, body {
   filter: drop-shadow(0 0 20px rgba(51, 204, 255, 0.3));
 }
 
-.final-best.new-record span {
-  background: linear-gradient(135deg, #ffcc00, #ff3366);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: glow-pulse 1s ease infinite;
-}
-
-.new-record-text {
-  font-size: clamp(0.8rem, 2vw, 1rem);
-  color: #ffcc00;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  animation: glow-pulse 0.8s ease infinite;
-}
-
 /* ------------------------------------------------------------
-   14. SHAKE OVERLAY
+   17. SHAKE OVERLAY
    ------------------------------------------------------------ */
 #shakeOverlay {
   position: absolute;
@@ -433,28 +718,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   15. DIFFICULTY BAR
-   ------------------------------------------------------------ */
-#difficultyBar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 20;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-#difficultyBar .fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #00ff88, #ffcc00, #ff3366);
-  transition: width 0.5s ease;
-  border-radius: 0 2px 2px 0;
-}
-
-/* ------------------------------------------------------------
-   16. KEYFRAMES
+   18. KEYFRAMES
    ------------------------------------------------------------ */
 @keyframes object-appear {
   0%   { transform: scale(0); opacity: 0; }
@@ -475,6 +739,11 @@ html, body {
 @keyframes ring-pulse {
   0%, 100% { transform: scale(1); opacity: 0.4; }
   50%      { transform: scale(1.15); opacity: 0.1; }
+}
+
+@keyframes timer-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes score-float {
@@ -500,7 +769,6 @@ html, body {
   100% { transform: scale(0.3) rotate(20deg); opacity: 0; }
 }
 
-
 @keyframes glow-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.7; transform: scale(1.05); }
@@ -525,8 +793,19 @@ html, body {
   50%      { filter: drop-shadow(0 0 70px rgba(255, 51, 102, 0.5)); }
 }
 
+@keyframes node-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(51, 204, 255, 0.3); }
+  50%      { box-shadow: 0 0 35px rgba(51, 204, 255, 0.5); }
+}
+
+@keyframes celebrate-bounce {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
 /* ------------------------------------------------------------
-   17. RESPONSIVE
+   19. RESPONSIVE
    ------------------------------------------------------------ */
 @media (max-width: 480px) {
   .btn {
@@ -538,6 +817,11 @@ html, body {
   .game-object {
     min-width: 50px;
     min-height: 50px;
+  }
+
+  .stat {
+    padding: 0.5rem 0.7rem;
+    min-width: 65px;
   }
 }
 

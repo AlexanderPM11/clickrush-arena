@@ -1,31 +1,68 @@
 /* ============================================================
-   MAIN — Entry point, event binding, initialisation
+   MAIN — Entry point, event binding, navigation
    ============================================================ */
 
 (function () {
   'use strict';
 
-  /* ---------- DOM refs ---------- */
-  const playBtn    = document.getElementById('playBtn');
-  const restartBtn = document.getElementById('restartBtn');
-  const homeBtn    = document.getElementById('homeBtn');
+  var playBtn       = document.getElementById('playBtn');
+  var restartBtn    = document.getElementById('restartBtn');
+  var homeBtn       = document.getElementById('homeBtn');
+  var mapHomeBtn    = document.getElementById('mapHomeBtn');
+  var nextLevelBtn  = document.getElementById('nextLevelBtn');
+  var completeMapBtn = document.getElementById('completeMapBtn');
+
+  /* ---------- Navigation helpers ---------- */
+
+  function goToLevelMap() {
+    UI.renderLevelMap(function (levelId) {
+      var level = Levels.getById(levelId);
+      if (level && Storage.isLevelUnlocked(levelId)) {
+        Game.startLevel(level);
+      }
+    });
+    UI.showScreen('level-map');
+  }
+
+  function goToStart() {
+    document.getElementById('bestScoreDisplay').textContent =
+      Storage.getBestScore().toLocaleString();
+    UI.showScreen('start');
+  }
 
   /* ---------- Button handlers ---------- */
 
-  playBtn.addEventListener('click', () => Game.start());
-  restartBtn.addEventListener('click', () => Game.start());
+  playBtn.addEventListener('click', goToLevelMap);
 
-  homeBtn.addEventListener('click', () => {
-    UI.showScreen('start');
-    document.getElementById('bestScoreDisplay').textContent =
-      Storage.getBestScore().toLocaleString();
+  restartBtn.addEventListener('click', function () {
+    var level = Game.getCurrentLevel();
+    if (level) Game.startLevel(level);
+    else goToLevelMap();
   });
 
-  /* ---------- Keyboard shortcuts ---------- */
+  homeBtn.addEventListener('click', goToLevelMap);
 
-  document.addEventListener('keydown', (e) => {
+  mapHomeBtn.addEventListener('click', goToStart);
+
+  nextLevelBtn.addEventListener('click', function () {
+    var current = Game.getCurrentLevel();
+    if (current) {
+      var next = Levels.getById(current.id + 1);
+      if (next) {
+        Game.startLevel(next);
+        return;
+      }
+    }
+    goToLevelMap();
+  });
+
+  completeMapBtn.addEventListener('click', goToLevelMap);
+
+  /* ---------- Keyboard ---------- */
+
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') {
-      const visibleBtn = document.querySelector('.screen:not(.hidden) .btn-primary');
+      var visibleBtn = document.querySelector('.screen:not(.hidden) .btn-primary');
       if (visibleBtn) {
         visibleBtn.click();
         e.preventDefault();
@@ -46,5 +83,5 @@
 
   UI.showScreen('start');
 
-  console.log('Click Frenzy loaded — good luck!');
+  console.log('Click Frenzy loaded \u2014 good luck!');
 })();

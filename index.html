@@ -14,22 +14,33 @@
   <!-- Shake overlay -->
   <div id="shakeOverlay"></div>
 
-  <!-- Start screen -->
+  <!-- ===== START SCREEN ===== -->
   <div id="startScreen" class="screen">
     <div class="screen-content">
       <h1 class="game-title">CLICK FRENZY</h1>
       <p class="subtitle">
         Toca los objetos brillantes antes de que desaparezcan.<br>
-        Cada acierto suma puntos, cada fallo cuesta una vida.
+        Supera la puntuaci&oacute;n objetivo de cada nivel para avanzar.
       </p>
       <button id="playBtn" class="btn btn-primary">Jugar</button>
       <div class="best-score">
-        Mejor puntuaci&oacute;n &mdash; <span id="bestScoreDisplay">0</span>
+        Mejor puntuaci&oacute;n global &mdash; <span id="bestScoreDisplay">0</span>
       </div>
     </div>
   </div>
 
-  <!-- Game screen -->
+  <!-- ===== LEVEL MAP SCREEN ===== -->
+  <div id="levelMapScreen" class="screen hidden">
+    <div class="map-header">
+      <h2>Mapa de Niveles</h2>
+    </div>
+    <div id="levelMapContainer"></div>
+    <div class="map-footer">
+      <button id="mapHomeBtn" class="btn btn-secondary">Men&uacute; principal</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
   <div id="gameScreen" class="screen hidden">
     <div id="hud">
       <div class="hud-item">
@@ -54,33 +65,65 @@
       </div>
     </div>
 
+    <div id="levelLabel"></div>
+    <div id="targetBar"><div class="fill" id="targetFill"></div></div>
     <div id="gameArea"></div>
     <div id="comboPopup"></div>
+  </div>
 
-    <div id="difficultyBar">
-      <div class="fill" id="difficultyFill"></div>
+  <!-- ===== LEVEL COMPLETE SCREEN ===== -->
+  <div id="levelCompleteScreen" class="screen hidden">
+    <div class="screen-content">
+      <div class="celebration-icon">&#9733;</div>
+      <h2 class="complete-title">Nivel Completado</h2>
+      <p class="complete-level-name" id="completeLevelInfo">Nivel 1</p>
+      <div class="complete-stats">
+        <div class="stat">
+          <span class="stat-value" id="completeScore">0</span>
+          <span class="stat-label">Puntuaci&oacute;n</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="completeTarget">0</span>
+          <span class="stat-label">Objetivo</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="completeTime">0:00</span>
+          <span class="stat-label">Tiempo</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="completeCombo">x1</span>
+          <span class="stat-label">Mejor combo</span>
+        </div>
+      </div>
+      <div id="allCompleteMessage" class="hidden">
+        <p class="new-record-text">&#161;Felicidades! Has completado todos los niveles</p>
+      </div>
+      <button id="nextLevelBtn" class="btn btn-primary">Siguiente nivel</button>
+      <button id="completeMapBtn" class="btn btn-secondary">Volver al mapa</button>
     </div>
   </div>
 
-  <!-- Game over screen -->
+  <!-- ===== GAME OVER SCREEN ===== -->
   <div id="gameOverScreen" class="screen hidden">
     <div class="screen-content">
       <h1 class="game-over-title">GAME OVER</h1>
+      <p class="complete-level-name" id="gameOverLevelInfo">Nivel 1</p>
       <div class="final-score">
-        <p>Puntuaci&oacute;n final</p>
+        <p>Puntuaci&oacute;n</p>
         <span id="finalScoreDisplay">0</span>
       </div>
-      <div class="final-best" id="finalBestContainer">
-        <p>Mejor puntuaci&oacute;n</p>
-        <span id="finalBestDisplay">0</span>
+      <div class="final-best">
+        <p>Objetivo del nivel</p>
+        <span id="finalTargetDisplay">0</span>
       </div>
       <button id="restartBtn" class="btn btn-primary">Reintentar</button>
-      <button id="homeBtn" class="btn btn-secondary">Men&uacute; principal</button>
+      <button id="homeBtn" class="btn btn-secondary">Volver al mapa</button>
     </div>
   </div>
 
 </div>
 
+<script src="js/levels.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
