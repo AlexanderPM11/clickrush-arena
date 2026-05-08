@@ -21,7 +21,6 @@ const Game = (function () {
   /* ---------- Helpers ---------- */
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
   function rand(min, max) { return Math.random() * (max - min) + min; }
-  function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 
   /* ---------- State factory ---------- */
 
@@ -59,8 +58,8 @@ const Game = (function () {
       size: Math.round(size),
       x: rand(pad, areaRect.width - pad),
       y: rand(pad, areaRect.height - pad),
-      color: UI.COLORS[randInt(0, UI.COLORS.length - 1)],
-      emoji: UI.EMOJIS[randInt(0, UI.EMOJIS.length - 1)],
+      color: UI.getRandomIconColor(),
+      icon: UI.getRandomIcon(),
     };
   }
 

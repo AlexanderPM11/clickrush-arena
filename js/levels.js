@@ -1,25 +1,43 @@
 /* ============================================================
-   LEVELS — Level definitions and configuration
+   LEVELS — 30 levels with progressive difficulty curve
    ============================================================ */
 
 const Levels = (function () {
-  const DATA = [
-    { id: 1,  targetScore: 30,  spawnDelay: 1400, lifetime: 2200, size: 70, maxObjects: 3, name: 'Principiante' },
-    { id: 2,  targetScore: 60,  spawnDelay: 1300, lifetime: 2050, size: 66, maxObjects: 3, name: 'Aprendiz' },
-    { id: 3,  targetScore: 100, spawnDelay: 1200, lifetime: 1900, size: 62, maxObjects: 4, name: 'Intermedio' },
-    { id: 4,  targetScore: 150, spawnDelay: 1100, lifetime: 1750, size: 59, maxObjects: 4, name: 'Avanzado' },
-    { id: 5,  targetScore: 200, spawnDelay: 1000, lifetime: 1600, size: 56, maxObjects: 4, name: 'Experto' },
-    { id: 6,  targetScore: 270, spawnDelay: 900,  lifetime: 1450, size: 53, maxObjects: 5, name: 'Élite' },
-    { id: 7,  targetScore: 350, spawnDelay: 810,  lifetime: 1300, size: 50, maxObjects: 5, name: 'Maestro' },
-    { id: 8,  targetScore: 440, spawnDelay: 730,  lifetime: 1150, size: 47, maxObjects: 5, name: 'Leyenda' },
-    { id: 9,  targetScore: 540, spawnDelay: 660,  lifetime: 1000, size: 44, maxObjects: 6, name: 'Mítico' },
-    { id: 10, targetScore: 650, spawnDelay: 590,  lifetime: 880,  size: 40, maxObjects: 6, name: 'Dios' },
+  var NAMES = [
+    'Principiante','Aprendiz','Novato','Iniciado','Cadete',
+    'Intermedio','Oficial','Veterano','Competente','Táctico',
+    'Avanzado','Estratega','Especialista','Maestro','Experto',
+    'Élite','Superior','Excelente','Genio','Campeón',
+    'Leyenda','Inmortal','Implacable','Titán','Coloso',
+    'Mítico','Divino','Supremo','Infinito','Dios',
   ];
 
+  var TOTAL = NAMES.length;
+
+  function generate() {
+    var levels = [];
+    for (var i = 1; i <= TOTAL; i++) {
+      var t = (i - 1) / (TOTAL - 1); // 0 → 1
+
+      levels.push({
+        id: i,
+        name: NAMES[i - 1],
+        targetScore: Math.round(50 + 280 * Math.pow(t, 1.15)),
+        spawnDelay:  Math.round(280 + 920 * Math.pow(0.935, i - 1)),
+        lifetime:    Math.round(350 + 1500 * Math.pow(0.925, i - 1)),
+        size:        Math.round(36 + 31 * Math.pow(0.95, i - 1)),
+        maxObjects:  Math.min(7, 3 + Math.floor(t * 5)),
+      });
+    }
+    return levels;
+  }
+
+  var DATA = generate();
+
   return {
-    getAll() { return DATA; },
-    getById(id) { return DATA.find(function (l) { return l.id === id; }) || null; },
-    getCount() { return DATA.length; },
-    getTotalLevels() { return DATA.length; },
+    getAll:      function () { return DATA; },
+    getById:     function (id) { return DATA[id - 1] || null; },
+    getCount:    function () { return DATA.length; },
+    getTotalLevels: function () { return DATA.length; },
   };
 })();

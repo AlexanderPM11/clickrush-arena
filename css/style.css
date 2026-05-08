@@ -190,7 +190,7 @@ html, body {
 }
 
 /* ------------------------------------------------------------
-   7. LEVEL MAP
+   7. LEVEL MAP — Curvy adventure-road style
    ------------------------------------------------------------ */
 #levelMapScreen {
   justify-content: flex-start;
@@ -219,11 +219,8 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-  max-width: 420px;
-  padding: 0.5rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 440px;
+  position: relative;
   scroll-behavior: smooth;
 }
 
@@ -253,125 +250,148 @@ html, body {
   font-size: 0.85rem;
 }
 
-/* Level node */
-.level-node {
+/* SVG path layer */
+.map-svg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-svg-layer path {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.5s ease;
+}
+
+.map-svg-layer .path-locked {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.map-svg-layer .path-completed {
+  stroke: url(#pathGradient);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.25));
+}
+
+.map-svg-layer .path-available {
+  stroke: rgba(51, 204, 255, 0.2);
+  stroke-dasharray: 6 4;
+}
+
+/* Level node — absolutely positioned */
+.level-node {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: default;
   transition: transform 0.3s ease;
-  padding: 0.25rem 0;
+  z-index: 2;
 }
 
-.level-node.unlocked {
+.level-node.clickable {
   cursor: pointer;
 }
 
-.level-node.unlocked:hover {
-  transform: scale(1.04);
+.level-node.clickable:hover {
+  transform: scale(1.06);
 }
 
-.level-node.unlocked:active {
-  transform: scale(0.97);
+.level-node.clickable:active {
+  transform: scale(0.94);
 }
 
 .node-circle {
-  width: clamp(56px, 14vw, 72px);
-  height: clamp(56px, 14vw, 72px);
+  width: clamp(52px, 13vw, 66px);
+  height: clamp(52px, 13vw, 66px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   transition: all 0.4s ease;
-  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-size: clamp(1rem, 3vw, 1.35rem);
   font-weight: 800;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
 .level-node.locked .node-circle {
-  background: rgba(255, 255, 255, 0.06);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.15);
 }
 
 .level-node.locked .node-circle::after {
   content: '\1F512';
-  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  font-size: clamp(0.65rem, 1.8vw, 0.85rem);
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  filter: grayscale(1) opacity(0.3);
+  bottom: 0;
+  right: 0;
+  filter: grayscale(1) opacity(0.2);
 }
 
 .level-node.available .node-circle {
-  background: radial-gradient(circle at 35% 35%, rgba(51, 204, 255, 0.25), rgba(51, 204, 255, 0.08));
+  background: radial-gradient(circle at 35% 35%, rgba(51, 204, 255, 0.3), rgba(51, 204, 255, 0.08));
   border: 2px solid #33ccff;
   color: #33ccff;
-  box-shadow: 0 0 20px rgba(51, 204, 255, 0.3);
-  animation: node-pulse 2s ease infinite;
+  box-shadow: 0 0 22px rgba(51, 204, 255, 0.35);
+  animation: node-pulse 2.5s ease infinite;
 }
 
 .level-node.completed .node-circle {
-  background: radial-gradient(circle at 35% 35%, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.05));
+  background: radial-gradient(circle at 35% 35%, rgba(0, 255, 136, 0.22), rgba(0, 255, 136, 0.05));
   border: 2px solid #00ff88;
   color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.2);
 }
 
 .level-node.completed .node-circle::after {
   content: '\2713';
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  font-size: clamp(0.8rem, 2vw, 1rem);
+  bottom: -3px;
+  right: -3px;
+  font-size: clamp(0.7rem, 1.8vw, 0.9rem);
   color: #00ff88;
   font-weight: 900;
   text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
 }
 
 .node-info {
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   text-align: center;
+  white-space: nowrap;
 }
 
 .node-name {
   display: block;
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-size: clamp(0.6rem, 1.6vw, 0.78rem);
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
-.level-node.locked .node-name { color: rgba(255, 255, 255, 0.2); }
+.level-node.locked .node-name { color: rgba(255, 255, 255, 0.15); }
 .level-node.available .node-name { color: #fff; }
-.level-node.completed .node-name { color: rgba(255, 255, 255, 0.7); }
+.level-node.completed .node-name { color: rgba(255, 255, 255, 0.65); }
 
-.node-target {
+.node-score {
   display: block;
-  font-size: clamp(0.6rem, 1.6vw, 0.75rem);
-  color: rgba(255, 255, 255, 0.3);
-  margin-top: 0.1rem;
+  font-size: clamp(0.5rem, 1.3vw, 0.65rem);
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 0.05rem;
 }
 
 .node-best {
   display: block;
-  font-size: clamp(0.55rem, 1.4vw, 0.7rem);
+  font-size: clamp(0.48rem, 1.2vw, 0.6rem);
   color: #ffcc00;
-  margin-top: 0.1rem;
+  margin-top: 0.05rem;
   font-weight: 600;
-}
-
-/* Connector between nodes */
-.level-connector {
-  width: 2px;
-  height: clamp(20px, 5vw, 32px);
-  background: rgba(255, 255, 255, 0.08);
-  flex-shrink: 0;
-  transition: background 0.5s ease;
-}
-
-.level-connector.completed {
-  background: rgba(0, 255, 136, 0.3);
 }
 
 /* ------------------------------------------------------------
@@ -514,10 +534,19 @@ html, body {
   touch-action: manipulation;
 }
 
-.game-object .emoji {
-  font-size: clamp(1rem, 3.5vw, 1.8rem);
+.game-object .emoji,
+.game-object .obj-icon {
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-object .obj-icon svg {
+  width: 55%;
+  height: 55%;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
 }
 
 .game-object.show {
@@ -794,14 +823,29 @@ html, body {
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(51, 204, 255, 0.3); }
-  50%      { box-shadow: 0 0 35px rgba(51, 204, 255, 0.5); }
+  0%, 100% { box-shadow: 0 0 22px rgba(51, 204, 255, 0.3); }
+  50%      { box-shadow: 0 0 40px rgba(51, 204, 255, 0.5); }
+}
+
+@keyframes path-flow {
+  0%   { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
 }
 
 @keyframes celebrate-bounce {
   0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
   60%  { transform: scale(1.2) rotate(3deg); opacity: 1; }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes node-enter {
+  0%   { transform: scale(0) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50%      { opacity: 1; transform: scale(1); }
 }
 
 /* ------------------------------------------------------------

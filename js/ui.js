@@ -23,76 +23,49 @@ const UI = (function () {
       targetFill:          document.getElementById('targetFill'),
       comboPopup:          document.getElementById('comboPopup'),
       shakeOverlay:        document.getElementById('shakeOverlay'),
-
-      /* level complete */
       completeLevelInfo:   document.getElementById('completeLevelInfo'),
       completeScore:       document.getElementById('completeScore'),
       completeTarget:      document.getElementById('completeTarget'),
       completeTime:        document.getElementById('completeTime'),
       completeCombo:       document.getElementById('completeCombo'),
       allCompleteMessage:  document.getElementById('allCompleteMessage'),
-
-      /* game over */
       finalScoreDisplay:   document.getElementById('finalScoreDisplay'),
       finalTargetDisplay:  document.getElementById('finalTargetDisplay'),
       gameOverLevelInfo:   document.getElementById('gameOverLevelInfo'),
-
-      /* map */
       mapHomeBtn:          document.getElementById('mapHomeBtn'),
     };
   }
 
   /* ---------- Screens ---------- */
 
-  var SCREENS = [
-    'start', 'level-map', 'game', 'level-complete', 'over',
-  ];
+  var SCREENS = ['start','level-map','game','level-complete','over'];
 
   function showScreen(name) {
     var map = {
-      'start':           dom.startScreen,
-      'level-map':       dom.levelMapScreen,
-      'game':            dom.gameScreen,
-      'level-complete':  dom.levelCompleteScreen,
-      'over':            dom.overScreen,
+      start: dom.startScreen, 'level-map': dom.levelMapScreen,
+      game: dom.gameScreen, 'level-complete': dom.levelCompleteScreen,
+      over: dom.overScreen,
     };
-    SCREENS.forEach(function (k) {
-      if (map[k]) map[k].classList.add('hidden');
-    });
-    var target = map[name];
-    if (target) target.classList.remove('hidden');
+    SCREENS.forEach(function (k) { if (map[k]) map[k].classList.add('hidden'); });
+    var t = map[name];
+    if (t) t.classList.remove('hidden');
   }
 
   /* ---------- HUD ---------- */
 
   function updateHUD(s) {
     dom.scoreDisplay.textContent = s.score.toLocaleString();
-
-    /* timer (counts up) */
     var mins = Math.floor(s.elapsed / 60);
     var secs = Math.floor(s.elapsed % 60);
     dom.timerDisplay.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
-
-    /* combo multiplier */
     dom.comboDisplay.textContent = 'x' + getMultiplier(s.combo);
-
-    /* hearts */
     var hearts = dom.livesDisplay.querySelectorAll('.heart');
-    hearts.forEach(function (h, i) {
-      h.classList.toggle('lost', i >= s.lives);
-      h.classList.toggle('active', i < s.lives);
-    });
-
-    /* target progress bar */
-    if (dom.targetFill) {
-      dom.targetFill.style.width = (s.progress * 100).toFixed(1) + '%';
-    }
+    hearts.forEach(function (h, i) { h.classList.toggle('lost', i >= s.lives); });
+    if (dom.targetFill) dom.targetFill.style.width = (s.progress * 100).toFixed(1) + '%';
   }
 
   function updateLevelLabel(level) {
-    if (dom.levelLabel) {
-      dom.levelLabel.textContent = 'Nivel ' + level.id + ' \u2014 ' + level.name;
-    }
+    if (dom.levelLabel) dom.levelLabel.textContent = 'Nivel ' + level.id + ' \u2014 ' + level.name;
   }
 
   /* ---------- Multiplier ---------- */
@@ -104,11 +77,27 @@ const UI = (function () {
     return 1;
   }
 
-  function getComboMultiplier(combo) {
-    return getMultiplier(combo);
+  function getComboMultiplier(combo) { return getMultiplier(combo); }
+
+  /* ---------- Icon helpers (delegated to Icons module) ---------- */
+
+  function getRandomIcon() {
+    return Icons.getRandom();
   }
 
-  /* ---------- Level map ---------- */
+  function getRandomIconColor() {
+    var colors = [
+      '#ff3366','#33ccff','#ffcc00','#00ff88','#ff6600',
+      '#cc44ff','#ff4488','#44ffcc','#ff9900','#66ffcc',
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  function makeIconSVG(pathD) {
+    return Icons.makeSVG(pathD);
+  }
+
+  /* ---------- Level map (curvy SVG path) ---------- */
 
   function renderLevelMap(onPlayLevel) {
     var container = dom.levelMapContainer;
@@ -118,57 +107,133 @@ const UI = (function () {
     var progress  = Storage.getProgress();
     var unlocked  = Storage.getUnlockedLevel();
 
+    var total = allLevels.length;
+    var cw = container.clientWidth || 380;
+    var nodeSize = 64;
+    var margin = 24;
+    var rowH = 86;
+
+    /* calculate positions */
+    var positions = [];
+    for (var i = 0; i < total; i++) {
+      var isRight = i % 2 === 0;
+      var x = isRight ? cw - margin - nodeSize / 2 : margin + nodeSize / 2;
+      var y = 50 + i * rowH;
+      positions.push({
+        cx: Math.round(x),
+        cy: Math.round(y),
+        left: Math.round(x - nodeSize / 2),
+        top: Math.round(y - nodeSize / 2),
+        side: isRight ? 'right' : 'left',
+      });
+    }
+
+    var totalH = positions[total - 1].top + nodeSize + 40;
+    container.style.height = totalH + 'px';
+    container.style.position = 'relative';
+
+    /* SVG gradient defs */
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'map-svg-layer');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', totalH);
+    svg.setAttribute('viewBox', '0 0 ' + cw + ' ' + totalH);
+    container.appendChild(svg);
+
+    var defs = document.createElementNS(svgNS, 'defs');
+    defs.innerHTML =
+      '<linearGradient id="pathGradient" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0%" stop-color="#00ff88"/>' +
+        '<stop offset="100%" stop-color="#33ccff"/>' +
+      '</linearGradient>';
+    svg.appendChild(defs);
+
+    /* draw path segments */
+    for (i = 0; i < total - 1; i++) {
+      var curr = positions[i];
+      var next = positions[i + 1];
+      var midY = (curr.cy + next.cy) / 2;
+
+      var d = 'M ' + curr.cx + ' ' + curr.cy +
+              ' C ' + curr.cx + ' ' + midY +
+              ', ' + next.cx + ' ' + midY +
+              ', ' + next.cx + ' ' + next.cy;
+
+      var path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', d);
+
+      var levelId = allLevels[i].id;
+      var isCompleted = progress.completedLevels.indexOf(levelId) !== -1;
+      var isNextUnlocked = allLevels[i + 1].id <= unlocked;
+
+      if (isCompleted) {
+        path.setAttribute('class', 'path-completed');
+      } else if (isNextUnlocked) {
+        path.setAttribute('class', 'path-available');
+      } else {
+        path.setAttribute('class', 'path-locked');
+      }
+
+      svg.appendChild(path);
+    }
+
+    /* render nodes */
     var frag = document.createDocumentFragment();
 
-    allLevels.forEach(function (level, idx) {
-      var isUnlocked  = level.id <= unlocked;
-      var isCompleted = progress.completedLevels.indexOf(level.id) !== -1;
-      var bestScore   = progress.bestScores[level.id] || 0;
+    for (i = 0; i < total; i++) {
+      (function (idx) {
+        var level = allLevels[idx];
+        var pos = positions[idx];
+        var isUnlocked  = level.id <= unlocked;
+        var isCompleted = progress.completedLevels.indexOf(level.id) !== -1;
+        var bestScore   = progress.bestScores[level.id] || 0;
 
-      /* node */
-      var node = document.createElement('div');
-      node.className = 'level-node';
-      if (isCompleted) node.classList.add('completed');
-      else if (isUnlocked) node.classList.add('available');
-      else node.classList.add('locked');
+        var node = document.createElement('div');
+        node.className = 'level-node';
+        if (isCompleted) node.classList.add('completed');
+        else if (isUnlocked) node.classList.add('available');
+        else node.classList.add('locked');
+        if (isUnlocked) node.classList.add('clickable');
 
-      node.innerHTML =
-        '<div class="node-circle">' + level.id + '</div>' +
-        '<div class="node-info">' +
-          '<span class="node-name">' + level.name + '</span>' +
-          '<span class="node-target">' + level.targetScore + ' pts</span>' +
-          (bestScore > 0
-            ? '<span class="node-best">Mejor: ' + bestScore + '</span>'
-            : '') +
-        '</div>';
+        node.style.left = pos.left + 'px';
+        node.style.top  = pos.top + 'px';
+        node.style.animation = 'node-enter 0.35s ease ' + (idx * 0.04) + 's both';
 
-      if (isUnlocked) {
-        node.addEventListener('click', function () {
-          onPlayLevel(level.id);
-        });
-      }
+        node.innerHTML =
+          '<div class="node-circle">' + level.id + '</div>' +
+          '<div class="node-info">' +
+            '<span class="node-name">' + level.name + '</span>' +
+            '<span class="node-score">' + level.targetScore + ' pts</span>' +
+            (bestScore > 0 ? '<span class="node-best">\u2605 ' + bestScore + '</span>' : '') +
+          '</div>';
 
-      frag.appendChild(node);
+        if (isUnlocked) {
+          node.addEventListener('click', function () { onPlayLevel(level.id); });
+        }
 
-      /* connector (not after last node) */
-      if (idx < allLevels.length - 1) {
-        var conn = document.createElement('div');
-        conn.className = 'level-connector';
-        if (isCompleted) conn.classList.add('completed');
-        frag.appendChild(conn);
-      }
-    });
+        frag.appendChild(node);
+      })(i);
+    }
 
     container.appendChild(frag);
+
+    /* decorative sparkles on completed paths */
+    var sparkleCount = Math.min(8, progress.completedLevels.length * 2);
+    for (var s = 0; s < sparkleCount; s++) {
+      var spark = document.createElement('div');
+      spark.style.cssText =
+        'position:absolute;width:4px;height:4px;border-radius:50%;' +
+        'background:#00ff88;pointer-events:none;z-index:3;' +
+        'box-shadow:0 0 6px #00ff88;' +
+        'animation:sparkle ' + (1.5 + Math.random() * 2) + 's ease ' + (Math.random() * 2) + 's infinite;' +
+        'left:' + (margin + Math.random() * (cw - margin * 2)) + 'px;' +
+        'top:' + (50 + Math.random() * (totalH - 100)) + 'px;';
+      container.appendChild(spark);
+    }
   }
 
-  /* ---------- Objects ---------- */
-
-  var EMOJIS = ['\u2605', '\u2666', '\u25CF', '\u25C6', '\u2726', '\u2B1F'];
-  var COLORS = [
-    '#ff3366', '#33ccff', '#ffcc00', '#00ff88',
-    '#ff6600', '#cc44ff', '#ff4488', '#44ffcc',
-  ];
+  /* ---------- Game object creation ---------- */
 
   function createObject(data, onHit, lifetime) {
     var el = document.createElement('div');
@@ -180,19 +245,20 @@ const UI = (function () {
     el.style.top     = data.y + 'px';
     el.style.background = 'radial-gradient(circle at 35% 35%, ' +
       data.color + 'dd, ' + data.color + '44)';
-    el.style.boxShadow = '0 0 ' + (data.size * 0.25).toFixed(0) + 'px ' +
-      data.color + '88, inset 0 -2px 4px rgba(0,0,0,0.2)';
+    el.style.boxShadow = '0 0 ' + (data.size * 0.28).toFixed(0) + 'px ' +
+      data.color + '88, 0 0 ' + (data.size * 0.5).toFixed(0) + 'px ' +
+      data.color + '22, inset 0 -3px 6px rgba(0,0,0,0.2)';
+
+    var iconSvg = makeIconSVG(data.icon);
 
     el.innerHTML =
       '<div class="glow-ring" style="color:' + data.color + '"></div>' +
       '<div class="object-timer" style="animation-duration:' + lifetime + 'ms"></div>' +
-      '<span class="emoji">' + data.emoji + '</span>';
+      '<span class="obj-icon">' + iconSvg + '</span>';
 
     el.addEventListener('click', function (e) { e.stopPropagation(); onHit(); });
     el.addEventListener('touchstart', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      onHit();
+      e.preventDefault(); e.stopPropagation(); onHit();
     }, { passive: false });
 
     requestAnimationFrame(function () { el.classList.add('show'); });
@@ -202,9 +268,7 @@ const UI = (function () {
   function removeObject(el, anim) {
     el.classList.remove('show');
     el.classList.add(anim || 'hide');
-    setTimeout(function () {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    }, 400);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 400);
   }
 
   /* ---------- Particles ---------- */
@@ -215,9 +279,9 @@ const UI = (function () {
     for (var i = 0; i < (count || 10); i++) {
       var p = document.createElement('div');
       p.className = 'particle';
-      var s   = rand(4, 10);
+      var s   = rand(3, 9);
       var ang = rand(0, Math.PI * 2);
-      var dist = rand(40, 120);
+      var dist = rand(35, 110);
       p.style.width  = s + 'px';
       p.style.height = s + 'px';
       p.style.left   = x + 'px';
@@ -225,7 +289,7 @@ const UI = (function () {
       p.style.background = color;
       p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
       p.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
-      p.style.boxShadow = '0 0 6px ' + color;
+      p.style.boxShadow = '0 0 5px ' + color;
       frag.appendChild(p);
     }
     area.appendChild(frag);
@@ -272,28 +336,22 @@ const UI = (function () {
 
   /* ---------- Level complete ---------- */
 
-  function showLevelComplete(level, stats, newlyUnlocked) {
+  function showLevelComplete(level, stats) {
     dom.completeLevelInfo.textContent = 'Nivel ' + level.id + ' \u2014 ' + level.name;
     dom.completeScore.textContent  = stats.score.toLocaleString();
     dom.completeTarget.textContent = stats.target.toLocaleString();
-
     var mins = Math.floor(stats.elapsed / 60);
     var secs = Math.floor(stats.elapsed % 60);
     dom.completeTime.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
     dom.completeCombo.textContent = 'x' + stats.maxCombo;
-
     var isLast = level.id >= Levels.getTotalLevels();
     var allMsg = dom.allCompleteMessage;
-    if (isLast) {
-      allMsg.classList.remove('hidden');
-    } else {
-      allMsg.classList.add('hidden');
-    }
-
+    if (isLast) allMsg.classList.remove('hidden');
+    else allMsg.classList.add('hidden');
     showScreen('level-complete');
   }
 
-  /* ---------- Game over (level context) ---------- */
+  /* ---------- Game over ---------- */
 
   function showGameOver(level, score) {
     dom.gameOverLevelInfo.textContent = 'Nivel ' + level.id + ' \u2014 ' + level.name;
@@ -307,7 +365,6 @@ const UI = (function () {
   function rand(min, max) { return Math.random() * (max - min) + min; }
 
   /* ---------- Init ---------- */
-
   cacheDom();
 
   /* ---------- Public API ---------- */
@@ -326,9 +383,8 @@ const UI = (function () {
     showLevelComplete: showLevelComplete,
     showGameOver: showGameOver,
     getComboMultiplier: getComboMultiplier,
-    rand: rand,
-    COLORS: COLORS,
-    EMOJIS: EMOJIS,
+    getRandomIcon: getRandomIcon,
+    getRandomIconColor: getRandomIconColor,
     getGameArea: function () { return dom.gameArea; },
   };
 })();
